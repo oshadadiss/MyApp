@@ -1,97 +1,116 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 🛍️ MyApp – React Native E-Commerce App
 
-# Getting Started
+**MyApp** is a modern e-commerce mobile application built with **React Native**, following clean architecture and best practices. It supports login authentication, product listing, cart management, and user profile features.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## 🚀 Features
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- 🔐 **Login Authentication**
+  - Validates user credentials
+  - Secure token handling with AsyncStorage
+  - Redirects based on login status
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- 🏠 **Cart Management**
+  - Add, remove, and clear cart items
+  - Dynamic total cost calculation
+  - Smooth UI interactions
 
-```sh
-# Using npm
-npm start
+- 👤 **User Profile**
+  - Fetches authenticated user data
+  - Displays detailed information including company, university, and contact info
+  - Logout functionality with confirmation
 
-# OR using Yarn
-yarn start
-```
+---
 
-## Step 2: Build and run your app
+## 🧱 Tech Stack
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+| Layer          | Library                            |
+|----------------|-------------------------------------|
+| UI             | React Native, TypeScript           |
+| Navigation     | React Navigation                   |
+| State Mgmt     | Redux Toolkit                      |
+| Storage        | AsyncStorage                       |
+| Networking     | Axios                              |
+| Icons          | React Native Vector Icons (Feather)|
+| Styling        | `StyleSheet` (inline styles)       |
 
-### Android
+---
 
-```sh
-# Using npm
-npm run android
+## 📂 Folder Structure
 
-# OR using Yarn
-yarn android
-```
+src/
+├── components/ # Reusable UI components
+├── navigation/ # Navigation config
+├── screens/ # Screen components (Login, Cart, Profile, etc.)
+├── services/ # API logic (e.g., ecommerce API)
+├── store/ # Redux slices and store setup
+├── utils/ # Helpers and storage utilities
 
-### iOS
+---
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+## 🔗 API Reference
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+Using [DummyJSON API](https://dummyjson.com)
 
-```sh
-bundle install
-```
+- `POST /auth/login` – Login
+- `GET /auth/me` – Get authenticated user
+- `GET /products` – Fetch product list
+- `GET /products/:id` – Get product by ID
+- `GET /products/search?q=term` – Search products
 
-Then, and every time you update your native dependencies, run:
+---
 
-```sh
-bundle exec pod install
-```
+## 🛠️ Setup & Installation
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+### 1. Clone the Repository
 
-```sh
-# Using npm
-npm run ios
+git clone https://github.com/oshadadiss/MyApp.git
+cd MyApp
 
-# OR using Yarn
-yarn ios
-```
+### 2. Install Dependencies
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+npm install
+# or
+yarn install
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### 3. Run the App
 
-## Step 3: Modify your app
+npx react-native run-android
+# or
+npx react-native run-ios
 
-Now that you have successfully run the app, let's make changes!
+## Screenshots
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+![b642f8fb-3132-495e-ba35-065eb420dc50](https://github.com/user-attachments/assets/c1496125-5254-4415-98cf-b36fba167835)
+![e6ddda76-f9fb-450e-b514-3132917099cf](https://github.com/user-attachments/assets/44fa3836-dd16-4ff7-b01a-448d11e422bc)
+![d77eed53-9f5b-4633-87c2-5affea107ae8](https://github.com/user-attachments/assets/6ab26e69-9fa9-4dcc-975f-0801f7996d05)
+![68080207-340b-4b3f-8411-a4b6dfe6a2e6](https://github.com/user-attachments/assets/1c183d3b-bacf-4429-bd5d-e81e5287c8ed)
+![269701ba-9aee-4ff1-abf3-947aff8950d5](https://github.com/user-attachments/assets/085c58a0-7d91-477d-9a80-25cdde2092d0)
+![0f95d34f-463f-4e1e-9938-f16c85a49b1a](https://github.com/user-attachments/assets/8576940b-e8e7-4ea7-bd6b-fa8dc45b19d6)
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+## Project Highlights
+-Uses Redux Toolkit slices to isolate business logic
+-UI is clean, modular, and responsive
+-AsyncStorage ensures user stays logged in even after closing the app
+-Uses TypeScript for type safety and clarity
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## Author
+Oshada Dissanayake
+GitHub: @oshadadiss
 
-## Congratulations! :tada:
+##✅ Future Improvements
+-Product detail and search screens
+-Checkout functionality
+-Redux persist for offline sync
+-Unit testing with Jest
 
-You've successfully run and modified your React Native App. :partying_face:
+##📄 License
+MIT – free to use and modify.
 
-### Now what?
+---
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Let me know if you'd like to:
+- Add dynamic screenshots
+- Customize this for deployment (e.g. Fastlane, APK)
+- Update after you upload more screens like Home or Search
