@@ -1,18 +1,24 @@
 import React from 'react';
-import { View, FlatList, StyleSheet, ActivityIndicator, Text } from 'react-native';
-import { ProductCard } from '../components/ProductCard';
-import { useProducts } from '../hooks/useProducts';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  Text,
+} from 'react-native';
+import {ProductCard} from '../components/ProductCard';
+import {useProducts} from '../hooks/useProducts';
+import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 type RootStackParamList = {
   Products: undefined;
-  ProductDetails: { productId: string };
+  ProductDetails: {productId: string};
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Products'>;
 
-export const ProductsScreen: React.FC<Props> = ({ navigation }) => {
-  const { products, isLoading, error } = useProducts();
+export const ProductsScreen: React.FC<Props> = ({navigation}) => {
+  const {products, isLoading, error} = useProducts();
 
   if (isLoading) {
     return (
@@ -25,7 +31,7 @@ export const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   if (error) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={styles.errorText}>hello {error}</Text>
       </View>
     );
   }
@@ -34,15 +40,15 @@ export const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     <View style={styles.container}>
       <FlatList
         data={products}
-        renderItem={({ item }) => (
+        renderItem={({item}) => (
           <ProductCard
             product={item}
             onPress={() =>
-              navigation.navigate('ProductDetails', { productId: item.id })
+              navigation.navigate('ProductDetails', {productId: item.id})
             }
           />
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.centered}>

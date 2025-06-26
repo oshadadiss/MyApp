@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Image,
 } from 'react-native';
 import {useAppSelector, useAppDispatch} from '../store/hooks';
 import {logout} from '../store/slices/authSlice';
@@ -13,8 +14,17 @@ import {Button} from '../components/Button';
 import {storage, StorageKeys} from '../utils/storage';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../navigation/types';
+
+type ProfileScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Main'
+>;
 
 export const ProfileScreen: React.FC = () => {
+  const navigation = useNavigation<ProfileScreenNavigationProp>();
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.auth.user);
   const [loading, setLoading] = useState(false);
@@ -37,6 +47,7 @@ export const ProfileScreen: React.FC = () => {
               await storage.removeItem(StorageKeys.AUTH_TOKEN);
               await storage.removeItem(StorageKeys.USER_DATA);
               dispatch(logout());
+              navigation.replace('Auth');
             } catch (error) {
               console.error('Logout failed:', error);
               Alert.alert('Error', 'Failed to logout. Please try again.');
@@ -58,11 +69,19 @@ export const ProfileScreen: React.FC = () => {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          <Text style={styles.avatarText}>
-            {user.name.charAt(0).toUpperCase()}
-          </Text>
+          {/* <Text style={styles.avatarText}>
+            {user.firstName.charAt(0).toUpperCase()}
+          </Text> */}
+          <Image
+            source={{uri: user.image}}
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 40,
+            }}
+          />
         </View>
-        <Text style={styles.name}>{user.name}</Text>
+        <Text style={styles.name}>{user.firstName}</Text>
         <Text style={styles.email}>{user.email}</Text>
       </View>
 
@@ -106,13 +125,16 @@ export const ProfileScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <Button
-        title="Logout"
-        onPress={handleLogout}
-        variant="outline"
-        loading={loading}
-        style={styles.logoutButton}
-      />
+      <View style={[styles.section, styles.logoutSection]}>
+        <Button
+          title="Logout"
+          onPress={handleLogout}
+          loading={loading}
+          variant="primary"
+          style={styles.logoutButton}
+          textStyle={styles.logoutButtonText}
+        />
+      </View>
     </ScrollView>
   );
 };
@@ -120,12 +142,12 @@ export const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#f5f5f5',
   },
   header: {
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
   },
   avatarContainer: {
     width: 80,
@@ -137,14 +159,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   avatarText: {
-    color: 'white',
+    color: '#fff',
     fontSize: 32,
     fontWeight: 'bold',
   },
   name: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 5,
   },
   email: {
@@ -152,27 +173,32 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   section: {
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
     marginTop: 20,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#EEE',
+    paddingHorizontal: 15,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
+    paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
+    borderBottomColor: '#f0f0f0',
   },
   menuText: {
     flex: 1,
-    fontSize: 16,
-    color: '#333',
     marginLeft: 15,
+    fontSize: 16,
+  },
+  logoutSection: {
+    marginTop: 20,
+    marginBottom: 30,
+    paddingVertical: 10,
   },
   logoutButton: {
-    margin: 20,
+    backgroundColor: '#FF3B30',
+  },
+  logoutButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

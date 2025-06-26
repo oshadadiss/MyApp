@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -14,6 +14,8 @@ import {ErrorBoundary} from './src/components/ErrorBoundary';
 import Feather from 'react-native-vector-icons/Feather';
 import {SearchScreen} from './src/screens/SearchScreen';
 import {RootStackParamList, TabParamList} from './src/navigation/types';
+import {useAppDispatch, useAppSelector} from './src/store/hooks';
+import {loadToken, selectToken, selectUser, selectIsInitialized} from './src/store/slices/authSlice';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -75,15 +77,35 @@ const TabNavigator = () => {
 };
 
 const NavigationRoot = () => {
+  const dispatch = useAppDispatch();
+  const token = useAppSelector(selectToken);
+  const user = useAppSelector(selectUser);
+  const isInitialized = useAppSelector(selectIsInitialized);
+  const isAuthenticated = token && user;
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const initApp = async () => {
+      await dispatch(loadToken());
+      // Add minimum delay for splash screen
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setIsLoading(false);
+    };
+    initApp();
+  }, [dispatch]);
+
   return (
     <NavigationContainer>
-      <Stack.Navigator 
-        initialRouteName="Splash"
-        screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="Auth" component={LoginScreen} />
-        <Stack.Screen name="Main" component={TabNavigator} />
-      </Stack.Navigator>
+      {(isLoading || !isInitialized) ? (
+        <SplashScreen />
+      ) : (
+        <Stack.Navigator
+          initialRouteName={isAuthenticated ? 'Main' : 'Auth'}
+          screenOptions={{headerShown: false}}>
+          <Stack.Screen name="Auth" component={LoginScreen} />
+          <Stack.Screen name="Main" component={TabNavigator} />
+        </Stack.Navigator>
+      )}
     </NavigationContainer>
   );
 };

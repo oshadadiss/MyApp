@@ -9,25 +9,32 @@ import {
   ScrollView,
 } from 'react-native';
 import {useAppDispatch, useAppSelector} from '../store/hooks';
-import {setUser, setToken, setLoading, setError} from '../store/slices/authSlice';
+import {
+  loginUser,
+  selectError,
+  selectIsLoading,
+} from '../store/slices/authSlice';
 import {Button} from '../components/Button';
 import {LoadingSpinner} from '../components/LoadingSpinner';
 import {validateEmail, validatePassword} from '../utils/validation';
-import {storage, StorageKeys} from '../utils/storage';
-import {authService} from '../services/authService';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../navigation/types';
 
-export const LoginScreen: React.FC = () => {
+type Props = NativeStackScreenProps<RootStackParamList, 'Auth'>;
+
+export const LoginScreen = ({navigation}: Props) => {
   const dispatch = useAppDispatch();
-  const {isLoading, error} = useAppSelector(state => state.auth);
-  const [email, setEmail] = useState('');
+  const isLoading = useAppSelector(selectIsLoading);
+  const error = useAppSelector(selectError);
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const validateForm = (): boolean => {
     const newErrors: string[] = [];
 
-    if (!validateEmail(email)) {
-      newErrors.push('Please enter a valid email address');
+    if (!username.trim()) {
+      newErrors.push('Please enter a username');
     }
 
     const passwordValidation = validatePassword(password);
@@ -40,24 +47,24 @@ export const LoginScreen: React.FC = () => {
   };
 
   const handleLogin = async () => {
-    if (!validateForm()) return;
+    // if (!validateForm()) return;
 
     try {
-      dispatch(setLoading(true));
-      dispatch(setError(null));
-
-      const response = await authService.login({email, password});
-      
-      await storage.setItem(StorageKeys.USER_DATA, response.user);
-      await storage.setItem(StorageKeys.AUTH_TOKEN, response.token);
-
-      dispatch(setUser(response.user));
-      dispatch(setToken(response.token));
+      console.log('Attempting login with:', {username, password});
+      const result = await dispatch(
+        loginUser({
+          username,
+          password,
+          expiresInMins: 30,
+        }),
+      ).unwrap();
+      console.log('Login successful:', result);
+      navigation.replace('Main');
     } catch (error) {
-      dispatch(setError(error instanceof Error ? error.message : 'Login failed'));
-      setValidationErrors(['Login failed. Please try again.']);
-    } finally {
-      dispatch(setLoading(false));
+      console.error('Login error:', error);
+      setValidationErrors([
+        error instanceof Error ? error.message : 'Login failed',
+      ]);
     }
   };
 
@@ -73,12 +80,11 @@ export const LoginScreen: React.FC = () => {
 
           <TextInput
             style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
+            placeholder="Username"
+            value={username}
+            onChangeText={setUsername}
             autoCapitalize="none"
-            keyboardType="email-address"
-            autoComplete="email"
+            autoComplete="username"
           />
 
           <TextInput
@@ -96,20 +102,18 @@ export const LoginScreen: React.FC = () => {
             </Text>
           ))}
 
-          {error && (
-            <Text style={styles.errorText}>{error}</Text>
-          )}
+          {error && <Text style={styles.errorText}>{error}</Text>}
 
           <Button
             title="Login"
             onPress={handleLogin}
             disabled={isLoading}
-            loading={isLoading}
+            variant="primary"
             style={styles.button}
           />
-        </View>
 
-        {isLoading && <LoadingSpinner />}
+          {isLoading && <LoadingSpinner />}
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -118,7 +122,7 @@ export const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#fff',
   },
   scrollContent: {
     flexGrow: 1,
@@ -128,11 +132,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 30,
+    marginBottom: 20,
     textAlign: 'center',
-    color: '#333',
   },
   input: {
     color: '#333',
@@ -148,9 +151,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   errorText: {
-    color: '#FF3B30',
-    fontSize: 14,
+    color: 'red',
     marginBottom: 10,
-    textAlign: 'center',
   },
 });
