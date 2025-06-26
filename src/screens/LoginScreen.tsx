@@ -81,6 +81,7 @@ export const LoginScreen = ({navigation}: Props) => {
           <TextInput
             style={styles.input}
             placeholder="Username"
+            placeholderTextColor="#666"
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
@@ -90,6 +91,7 @@ export const LoginScreen = ({navigation}: Props) => {
           <TextInput
             style={styles.input}
             placeholder="Password"
+            placeholderTextColor="#666"
             value={password}
             onChangeText={setPassword}
             secureTextEntry

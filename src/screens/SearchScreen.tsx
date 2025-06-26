@@ -49,6 +49,7 @@ export const SearchScreen: React.FC<Props> = ({navigation}) => {
         <TextInput
           style={styles.searchInput}
           placeholder="Search products..."
+          placeholderTextColor="#666"
           value={searchQuery}
           onChangeText={setSearchQuery}
           autoCapitalize="none"
