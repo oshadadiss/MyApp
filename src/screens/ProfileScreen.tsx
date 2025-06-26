@@ -10,7 +10,7 @@ import {
   TextInput,
 } from 'react-native';
 import {useAppSelector, useAppDispatch} from '../store/hooks';
-import {logout, getUserDetails, selectToken} from '../store/slices/authSlice';
+import {logoutUser, getUserDetails, selectToken} from '../store/slices/authSlice';
 import {Button} from '../components/Button';
 import {storage, StorageKeys} from '../utils/storage';
 // @ts-ignore
@@ -65,9 +65,7 @@ export const ProfileScreen: React.FC = () => {
           onPress: async () => {
             setLoading(true);
             try {
-              await storage.removeItem(StorageKeys.AUTH_TOKEN);
-              await storage.removeItem(StorageKeys.USER_DATA);
-              dispatch(logout());
+              await dispatch(logoutUser()).unwrap();
               navigation.replace('Auth');
             } catch (error) {
               console.error('Logout failed:', error);

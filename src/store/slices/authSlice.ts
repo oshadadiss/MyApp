@@ -1,6 +1,8 @@
 import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import {storage, StorageKeys} from '../../utils/storage';
 import {RootState} from '../store';
+import {clearCart} from './cartSlice';
+import {AppDispatch} from '../store';
 
 interface User {
   id: number;
@@ -130,6 +132,16 @@ export const getUserDetails = createAsyncThunk(
   },
 );
 
+export const logoutUser = createAsyncThunk(
+  'auth/logout',
+  async (_, {dispatch}) => {
+    await storage.removeItem(StorageKeys.AUTH_TOKEN);
+    await storage.removeItem(StorageKeys.USER_DATA);
+    dispatch(clearCart());
+    dispatch(logout());
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -152,8 +164,6 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.error = null;
-      storage.removeItem(StorageKeys.AUTH_TOKEN);
-      storage.removeItem(StorageKeys.USER_DATA);
     },
   },
   extraReducers: builder => {
