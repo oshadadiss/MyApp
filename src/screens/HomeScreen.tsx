@@ -1,14 +1,14 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {useSelector} from 'react-redux';
+import { View, Text, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
-import type {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
-import type {RootState} from '../store/store';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { RootState } from '../store/store';
 
 type RootTabParamList = {
-  Home: undefined,
-  Settings: undefined,
+  Home: undefined;
+  Settings: undefined;
 };
 
 type Props = BottomTabScreenProps<RootTabParamList, 'Home'>;
