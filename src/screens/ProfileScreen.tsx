@@ -8,7 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import {useAppSelector, useAppDispatch} from '../store/hooks';
-import {clearUser} from '../store/slices/userSlice';
+import {logout} from '../store/slices/authSlice';
 import {Button} from '../components/Button';
 import {storage, StorageKeys} from '../utils/storage';
 // @ts-ignore
@@ -16,7 +16,7 @@ import Feather from 'react-native-vector-icons/Feather';
 
 export const ProfileScreen: React.FC = () => {
   const dispatch = useAppDispatch();
-  const user = useAppSelector(state => state.user.user);
+  const user = useAppSelector(state => state.auth.user);
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
@@ -36,7 +36,7 @@ export const ProfileScreen: React.FC = () => {
             try {
               await storage.removeItem(StorageKeys.AUTH_TOKEN);
               await storage.removeItem(StorageKeys.USER_DATA);
-              dispatch(clearUser());
+              dispatch(logout());
             } catch (error) {
               console.error('Logout failed:', error);
               Alert.alert('Error', 'Failed to logout. Please try again.');

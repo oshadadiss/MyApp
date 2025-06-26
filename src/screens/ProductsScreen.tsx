@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
-import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchProducts } from '../store/slices/productsSlice';
+import React from 'react';
+import { View, FlatList, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { ProductCard } from '../components/ProductCard';
+import { useProducts } from '../hooks/useProducts';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
@@ -13,14 +12,9 @@ type RootStackParamList = {
 type Props = NativeStackScreenProps<RootStackParamList, 'Products'>;
 
 export const ProductsScreen: React.FC<Props> = ({ navigation }) => {
-  const dispatch = useAppDispatch();
-  const { items, loading, error } = useAppSelector((state) => state.products);
+  const { products, isLoading, error } = useProducts();
 
-  useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#007AFF" />
@@ -28,10 +22,18 @@ export const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     );
   }
 
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
-        data={items}
+        data={products}
         renderItem={({ item }) => (
           <ProductCard
             product={item}
@@ -42,6 +44,11 @@ export const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         )}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        ListEmptyComponent={
+          <View style={styles.centered}>
+            <Text style={styles.emptyText}>No products available</Text>
+          </View>
+        }
       />
     </View>
   );
@@ -59,5 +66,16 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: 8,
+  },
+  errorText: {
+    color: '#FF3B30',
+    fontSize: 16,
+    textAlign: 'center',
+    marginHorizontal: 20,
+  },
+  emptyText: {
+    color: '#8E8E93',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

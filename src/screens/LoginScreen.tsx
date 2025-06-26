@@ -8,19 +8,20 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import {useAppDispatch} from '../store/hooks';
-import {setUser} from '../store/slices/userSlice';
+import {useAppDispatch, useAppSelector} from '../store/hooks';
+import {setUser, setToken, setLoading, setError} from '../store/slices/authSlice';
 import {Button} from '../components/Button';
 import {LoadingSpinner} from '../components/LoadingSpinner';
 import {validateEmail, validatePassword} from '../utils/validation';
 import {storage, StorageKeys} from '../utils/storage';
+import {authService} from '../services/authService';
 
 export const LoginScreen: React.FC = () => {
   const dispatch = useAppDispatch();
+  const {isLoading, error} = useAppSelector(state => state.auth);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const validateForm = (): boolean => {
     const newErrors: string[] = [];
@@ -34,34 +35,29 @@ export const LoginScreen: React.FC = () => {
       newErrors.push(...passwordValidation.errors);
     }
 
-    setErrors(newErrors);
+    setValidationErrors(newErrors);
     return newErrors.length === 0;
   };
 
   const handleLogin = async () => {
     if (!validateForm()) return;
 
-    setLoading(true);
-    setErrors([]);
-
     try {
-      // Simulated API call - replace with actual authentication
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      dispatch(setLoading(true));
+      dispatch(setError(null));
 
-      const userData = {
-        id: '1',
-        email,
-        name: 'John Doe',
-      };
+      const response = await authService.login({email, password});
+      
+      await storage.setItem(StorageKeys.USER_DATA, response.user);
+      await storage.setItem(StorageKeys.AUTH_TOKEN, response.token);
 
-      await storage.setItem(StorageKeys.USER_DATA, userData);
-      await storage.setItem(StorageKeys.AUTH_TOKEN, 'dummy-token');
-
-      dispatch(setUser(userData));
+      dispatch(setUser(response.user));
+      dispatch(setToken(response.token));
     } catch (error) {
-      setErrors(['Login failed. Please try again.']);
+      dispatch(setError(error instanceof Error ? error.message : 'Login failed'));
+      setValidationErrors(['Login failed. Please try again.']);
     } finally {
-      setLoading(false);
+      dispatch(setLoading(false));
     }
   };
 
@@ -94,22 +90,26 @@ export const LoginScreen: React.FC = () => {
             autoComplete="password"
           />
 
-          {errors.map((error, index) => (
+          {validationErrors.map((error, index) => (
             <Text key={index} style={styles.errorText}>
               {error}
             </Text>
           ))}
 
+          {error && (
+            <Text style={styles.errorText}>{error}</Text>
+          )}
+
           <Button
             title="Login"
             onPress={handleLogin}
-            disabled={loading}
-            loading={loading}
+            disabled={isLoading}
+            loading={isLoading}
             style={styles.button}
           />
         </View>
 
-        {loading && <LoadingSpinner />}
+        {isLoading && <LoadingSpinner />}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -149,7 +149,8 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: '#FF3B30',
-    marginBottom: 10,
     fontSize: 14,
+    marginBottom: 10,
+    textAlign: 'center',
   },
 });

@@ -8,21 +8,12 @@ import {ProductsScreen} from './src/screens/ProductsScreen';
 import {CartScreen} from './src/screens/CartScreen';
 import {LoginScreen} from './src/screens/LoginScreen';
 import {ProfileScreen} from './src/screens/ProfileScreen';
-import {useAppSelector} from './src/store/hooks';
+import {SplashScreen} from './src/screens/SplashScreen';
 import {ErrorBoundary} from './src/components/ErrorBoundary';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
-
-type RootStackParamList = {
-  Auth: undefined;
-  Main: undefined;
-};
-
-type TabParamList = {
-  Products: undefined;
-  Cart: undefined;
-  Profile: undefined;
-};
+import {SearchScreen} from './src/screens/SearchScreen';
+import {RootStackParamList, TabParamList} from './src/navigation/types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -36,6 +27,8 @@ const TabNavigator = () => {
 
           if (route.name === 'Products') {
             iconName = 'shopping-bag';
+          } else if (route.name === 'Search') {
+            iconName = 'search';
           } else if (route.name === 'Cart') {
             iconName = 'shopping-cart';
           } else if (route.name === 'Profile') {
@@ -57,6 +50,13 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
+        name="Search"
+        component={SearchScreen}
+        options={{
+          title: 'Search',
+        }}
+      />
+      <Tab.Screen
         name="Cart"
         component={CartScreen}
         options={{
@@ -75,28 +75,26 @@ const TabNavigator = () => {
 };
 
 const NavigationRoot = () => {
-  const user = useAppSelector(state => state.user.user);
-
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        {user ? (
-          <Stack.Screen name="Main" component={TabNavigator} />
-        ) : (
-          <Stack.Screen name="Auth" component={LoginScreen} />
-        )}
+      <Stack.Navigator 
+        initialRouteName="Splash"
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="Auth" component={LoginScreen} />
+        <Stack.Screen name="Main" component={TabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-const App: React.FC = () => {
+const App = () => {
   return (
-    <ErrorBoundary>
-      <Provider store={store}>
+    <Provider store={store}>
+      <ErrorBoundary>
         <NavigationRoot />
-      </Provider>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </Provider>
   );
 };
 
