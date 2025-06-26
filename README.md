@@ -83,6 +83,7 @@ npx react-native run-ios
 ## Screenshots
 
 ![b642f8fb-3132-495e-ba35-065eb420dc50](https://github.com/user-attachments/assets/c1496125-5254-4415-98cf-b36fba167835)
+![vlcsnap-2025-06-27-02h50m18s124](https://github.com/user-attachments/assets/778c98d9-1253-4c31-a73e-9f2b90f16155)
 ![e6ddda76-f9fb-450e-b514-3132917099cf](https://github.com/user-attachments/assets/44fa3836-dd16-4ff7-b01a-448d11e422bc)
 ![d77eed53-9f5b-4633-87c2-5affea107ae8](https://github.com/user-attachments/assets/6ab26e69-9fa9-4dcc-975f-0801f7996d05)
 ![68080207-340b-4b3f-8411-a4b6dfe6a2e6](https://github.com/user-attachments/assets/1c183d3b-bacf-4429-bd5d-e81e5287c8ed)
