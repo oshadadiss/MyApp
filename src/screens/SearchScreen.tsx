@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {useProducts} from '../hooks/useProducts';
 import {ProductCard} from '../components/ProductCard';
+import {ProductModal} from '../components/ProductModal';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
@@ -24,6 +25,8 @@ export const SearchScreen: React.FC<Props> = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [previousQuery, setPreviousQuery] = useState('');
   const {searchResults, searchForProducts, isLoading, error} = useProducts();
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     if (searchQuery.length >= 2 && searchQuery !== previousQuery) {
@@ -35,6 +38,11 @@ export const SearchScreen: React.FC<Props> = ({navigation}) => {
   const handleClearSearch = () => {
     setSearchQuery('');
     setPreviousQuery('');
+  };
+
+  const handleProductPress = (product: any) => {
+    setSelectedProduct(product);
+    setModalVisible(true);
   };
 
   return (
@@ -78,9 +86,7 @@ export const SearchScreen: React.FC<Props> = ({navigation}) => {
           renderItem={({item}) => (
             <ProductCard
               product={item}
-              onPress={() =>
-                navigation.navigate('ProductDetails', {productId: item.id})
-              }
+              onPress={() => handleProductPress(item)}
             />
           )}
           keyExtractor={item => item.id.toString()}
@@ -95,6 +101,12 @@ export const SearchScreen: React.FC<Props> = ({navigation}) => {
           }
         />
       )}
+
+      <ProductModal
+        visible={modalVisible}
+        product={selectedProduct}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 };
@@ -102,49 +114,54 @@ export const SearchScreen: React.FC<Props> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5F5F5',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    margin: 16,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  searchIcon: {
-    marginRight: 8,
+    backgroundColor: 'white',
+    margin: 10,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   searchInput: {
     flex: 1,
-    height: 40,
+    height: 50,
     fontSize: 16,
-    color: '#333',
+    color: '#000',
+    marginLeft: 10,
+  },
+  searchIcon: {
+    marginRight: 5,
   },
   clearIcon: {
-    marginLeft: 8,
-    padding: 4,
-  },
-  loader: {
-    flex: 1,
+    padding: 5,
   },
   productList: {
-    padding: 16,
+    padding: 10,
   },
   centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
   },
   errorText: {
     color: '#FF3B30',
     fontSize: 16,
     textAlign: 'center',
+    marginHorizontal: 20,
   },
   emptyText: {
     color: '#8E8E93',
     fontSize: 16,
     textAlign: 'center',
+  },
+  loader: {
+    marginTop: 20,
   },
 });
