@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   FlatList,
@@ -7,6 +7,7 @@ import {
   Text,
 } from 'react-native';
 import {ProductCard} from '../components/ProductCard';
+import {ProductModal} from '../components/ProductModal';
 import {useProducts} from '../hooks/useProducts';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
@@ -19,6 +20,13 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Products'>;
 
 export const ProductsScreen: React.FC<Props> = ({navigation}) => {
   const {products, isLoading, error} = useProducts();
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleProductPress = (product: any) => {
+    setSelectedProduct(product);
+    setModalVisible(true);
+  };
 
   if (isLoading.products) {
     return (
@@ -43,9 +51,7 @@ export const ProductsScreen: React.FC<Props> = ({navigation}) => {
         renderItem={({item}) => (
           <ProductCard
             product={item}
-            onPress={() =>
-              navigation.navigate('ProductDetails', {productId: item.id})
-            }
+            onPress={() => handleProductPress(item)}
           />
         )}
         keyExtractor={item => item.id.toString()}
@@ -55,6 +61,12 @@ export const ProductsScreen: React.FC<Props> = ({navigation}) => {
             <Text style={styles.emptyText}>No products available</Text>
           </View>
         }
+      />
+
+      <ProductModal
+        visible={modalVisible}
+        product={selectedProduct}
+        onClose={() => setModalVisible(false)}
       />
     </View>
   );
