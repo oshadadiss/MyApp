@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
-import {CartItem as CartItemType} from '../services/ecommerce';
+import type {CartItem as CartItemType} from '../store/slices/cartSlice';
 import {useAppDispatch} from '../store/hooks';
 import {removeItem, updateQuantity} from '../store/slices/cartSlice';
 // @ts-ignore
@@ -29,9 +29,9 @@ export const CartItem: React.FC<CartItemProps> = ({item}) => {
 
   return (
     <View style={styles.container}>
-      <Image source={{uri: item.image}} style={styles.image} />
+      <Image source={{uri: item.thumbnail}} style={styles.image} />
       <View style={styles.details}>
-        <Text style={styles.name}>{item.name}</Text>
+        <Text style={styles.name}>{item.title}</Text>
         <Text style={styles.price}>
           ${(item.price * item.quantity).toFixed(2)}
         </Text>
@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 8,
+    backgroundColor: '#F5F5F5',
   },
   details: {
     flex: 1,
@@ -81,13 +82,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   name: {
+    color: '#333',
     fontSize: 16,
     fontWeight: '600',
+    marginBottom: 4,
   },
   price: {
     fontSize: 16,
     color: '#007AFF',
     fontWeight: '600',
+    marginBottom: 4,
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -99,9 +103,10 @@ const styles = StyleSheet.create({
   quantity: {
     fontSize: 16,
     marginHorizontal: 12,
+    color: '#333',
   },
   removeButton: {
     padding: 8,
-    justifyContent: 'center',
+    alignSelf: 'center',
   },
 });

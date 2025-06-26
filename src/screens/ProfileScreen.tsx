@@ -1,15 +1,16 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   Image,
+  Alert,
+  TextInput,
 } from 'react-native';
 import {useAppSelector, useAppDispatch} from '../store/hooks';
-import {logout} from '../store/slices/authSlice';
+import {logout, getUserDetails, selectToken} from '../store/slices/authSlice';
 import {Button} from '../components/Button';
 import {storage, StorageKeys} from '../utils/storage';
 // @ts-ignore
@@ -27,7 +28,27 @@ export const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.auth.user);
+  const token = useAppSelector(selectToken);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (token) {
+        try {
+          const result = await dispatch(getUserDetails()).unwrap();
+          console.log('User details fetched:', result);
+        } catch (error) {
+          console.error('Failed to fetch user details:', error);
+          Alert.alert('Error', 'Failed to fetch user details');
+        }
+      } else {
+        console.log('No token available');
+        navigation.replace('Auth');
+      }
+    };
+
+    fetchUserDetails();
+  }, [dispatch, token, navigation]);
 
   const handleLogout = async () => {
     Alert.alert(
@@ -69,9 +90,6 @@ export const ProfileScreen: React.FC = () => {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          {/* <Text style={styles.avatarText}>
-            {user.firstName.charAt(0).toUpperCase()}
-          </Text> */}
           <Image
             source={{uri: user.image}}
             style={{
@@ -81,48 +99,67 @@ export const ProfileScreen: React.FC = () => {
             }}
           />
         </View>
-        <Text style={styles.name}>{user.firstName}</Text>
-        <Text style={styles.email}>{user.email}</Text>
       </View>
 
       <View style={styles.section}>
-        <TouchableOpacity style={styles.menuItem}>
-          <Feather name="user" size={24} color="#333" />
-          <Text style={styles.menuText}>Edit Profile</Text>
-          <Feather name="chevron-right" size={24} color="#999" />
-        </TouchableOpacity>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Full Name</Text>
+          <TextInput
+            style={styles.input}
+            value={`${user.firstName} ${user.lastName}`}
+            editable={false}
+          />
+        </View>
 
-        <TouchableOpacity style={styles.menuItem}>
-          <Feather name="shopping-bag" size={24} color="#333" />
-          <Text style={styles.menuText}>Order History</Text>
-          <Feather name="chevron-right" size={24} color="#999" />
-        </TouchableOpacity>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput style={styles.input} value={user.email} editable={false} />
+        </View>
 
-        <TouchableOpacity style={styles.menuItem}>
-          <Feather name="map-pin" size={24} color="#333" />
-          <Text style={styles.menuText}>Shipping Addresses</Text>
-          <Feather name="chevron-right" size={24} color="#999" />
-        </TouchableOpacity>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Designation</Text>
+          <TextInput
+            style={styles.input}
+            value={user.company?.title || 'Not specified'}
+            editable={false}
+          />
+        </View>
 
-        <TouchableOpacity style={styles.menuItem}>
-          <Feather name="credit-card" size={24} color="#333" />
-          <Text style={styles.menuText}>Payment Methods</Text>
-          <Feather name="chevron-right" size={24} color="#999" />
-        </TouchableOpacity>
-      </View>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Works At</Text>
+          <TextInput
+            style={styles.input}
+            value={user.company?.name || 'Not specified'}
+            editable={false}
+          />
+        </View>
 
-      <View style={styles.section}>
-        <TouchableOpacity style={styles.menuItem}>
-          <Feather name="bell" size={24} color="#333" />
-          <Text style={styles.menuText}>Notifications</Text>
-          <Feather name="chevron-right" size={24} color="#999" />
-        </TouchableOpacity>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Gender</Text>
+          <TextInput
+            style={styles.input}
+            value={user.gender}
+            editable={false}
+          />
+        </View>
 
-        <TouchableOpacity style={styles.menuItem}>
-          <Feather name="lock" size={24} color="#333" />
-          <Text style={styles.menuText}>Privacy Settings</Text>
-          <Feather name="chevron-right" size={24} color="#999" />
-        </TouchableOpacity>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Contact</Text>
+          <TextInput
+            style={styles.input}
+            value={user.phone || 'Not specified'}
+            editable={false}
+          />
+        </View>
+
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Studies At</Text>
+          <TextInput
+            style={styles.input}
+            value={user.university || 'Not specified'}
+            editable={false}
+          />
+        </View>
       </View>
 
       <View style={[styles.section, styles.logoutSection]}>
@@ -158,41 +195,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  avatarText: {
-    color: '#fff',
-    fontSize: 32,
-    fontWeight: 'bold',
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  email: {
-    fontSize: 16,
-    color: '#666',
-  },
   section: {
     backgroundColor: '#fff',
     marginTop: 20,
     paddingHorizontal: 15,
+    paddingVertical: 10,
   },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+  fieldContainer: {
+    marginBottom: 15,
   },
-  menuText: {
-    flex: 1,
-    marginLeft: 15,
+  label: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+    fontWeight: '500',
+  },
+  input: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    padding: 12,
     fontSize: 16,
+    color: '#333',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
   logoutSection: {
     marginTop: 20,
     marginBottom: 30,
-    paddingVertical: 10,
   },
   logoutButton: {
     backgroundColor: '#FF3B30',

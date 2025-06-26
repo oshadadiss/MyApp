@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { Product } from '../services/ecommerce';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import type { Product } from '../store/slices/productSlice';
 import { useAppDispatch } from '../store/hooks';
 import { addItem } from '../store/slices/cartSlice';
+// @ts-ignore
+import Feather from 'react-native-vector-icons/Feather';
 
 interface ProductCardProps {
   product: Product;
@@ -14,19 +16,29 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) =>
 
   const handleAddToCart = () => {
     dispatch(addItem({ ...product, quantity: 1 }));
+    Alert.alert(
+      'Success',
+      `${product.title} has been added to your cart`,
+      [{ text: 'OK', style: 'default' }],
+      { cancelable: true }
+    );
   };
 
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image
-        source={{ uri: product.image }}
+        source={{ uri: product.thumbnail }}
         style={styles.image}
         resizeMode="cover"
       />
       <View style={styles.content}>
-        <Text style={styles.name}>{product.name}</Text>
+        <Text style={styles.name}>{product.title}</Text>
+        <Text style={styles.description} numberOfLines={2}>{product.description}</Text>
         <Text style={styles.price}>${product.price.toFixed(2)}</Text>
-        <Text style={styles.category}>{product.category}</Text>
+        <View style={styles.details}>
+          <Text style={styles.category}>{product.category}</Text>
+          <Text style={styles.rating}>★ {product.rating.toFixed(1)}</Text>
+        </View>
       </View>
       <TouchableOpacity style={styles.addButton} onPress={handleAddToCart}>
         <Text style={styles.buttonText}>Add to Cart</Text>
@@ -51,6 +63,7 @@ const styles = StyleSheet.create({
     height: 200,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
+    backgroundColor: '#F5F5F5',
   },
   content: {
     padding: 12,
@@ -60,15 +73,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 4,
   },
+  description: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
   price: {
     fontSize: 18,
     color: '#007AFF',
     fontWeight: '600',
     marginBottom: 4,
   },
+  details: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   category: {
     fontSize: 14,
     color: '#666',
+  },
+  rating: {
+    fontSize: 14,
+    color: '#FFB800',
+    fontWeight: '600',
   },
   addButton: {
     backgroundColor: '#007AFF',

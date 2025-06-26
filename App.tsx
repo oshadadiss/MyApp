@@ -16,6 +16,7 @@ import {SearchScreen} from './src/screens/SearchScreen';
 import {RootStackParamList, TabParamList} from './src/navigation/types';
 import {useAppDispatch, useAppSelector} from './src/store/hooks';
 import {loadToken, selectToken, selectUser, selectIsInitialized} from './src/store/slices/authSlice';
+import {loadCartFromStorage, setCartItems} from './src/store/slices/cartSlice';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -87,6 +88,9 @@ const NavigationRoot = () => {
   useEffect(() => {
     const initApp = async () => {
       await dispatch(loadToken());
+      // Load saved cart items
+      const savedCartItems = await loadCartFromStorage();
+      dispatch(setCartItems(savedCartItems));
       // Add minimum delay for splash screen
       await new Promise(resolve => setTimeout(resolve, 2000));
       setIsLoading(false);
@@ -98,12 +102,13 @@ const NavigationRoot = () => {
     <NavigationContainer>
       {(isLoading || !isInitialized) ? (
         <SplashScreen />
-      ) : (
-        <Stack.Navigator
-          initialRouteName={isAuthenticated ? 'Main' : 'Auth'}
-          screenOptions={{headerShown: false}}>
-          <Stack.Screen name="Auth" component={LoginScreen} />
+      ) : isAuthenticated ? (
+        <Stack.Navigator screenOptions={{headerShown: false}}>
           <Stack.Screen name="Main" component={TabNavigator} />
+        </Stack.Navigator>
+      ) : (
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+          <Stack.Screen name="Auth" component={LoginScreen} />
         </Stack.Navigator>
       )}
     </NavigationContainer>
@@ -112,11 +117,11 @@ const NavigationRoot = () => {
 
 const App = () => {
   return (
-    <Provider store={store}>
-      <ErrorBoundary>
+    <ErrorBoundary>
+      <Provider store={store}>
         <NavigationRoot />
-      </ErrorBoundary>
-    </Provider>
+      </Provider>
+    </ErrorBoundary>
   );
 };
 

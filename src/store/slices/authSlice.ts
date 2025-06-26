@@ -10,6 +10,10 @@ interface User {
   lastName: string;
   gender: string;
   image: string;
+  role?: string;
+  company?: any;
+  phone?: string;
+  university?: string;
 }
 
 interface LoginResponse extends User {
@@ -55,6 +59,7 @@ export const loginUser = createAsyncThunk<LoginResponse, LoginCredentials>(
       }
 
       const data = await response.json();
+      console.log('Login response:', data);
       await storage.setItem(StorageKeys.AUTH_TOKEN, data.accessToken);
       await storage.setItem(StorageKeys.USER_DATA, data);
       return data;
@@ -82,6 +87,45 @@ export const loadToken = createAsyncThunk(
     } catch (error) {
       console.error('Error loading token:', error);
       return null;
+    }
+  },
+);
+
+export const getUserDetails = createAsyncThunk(
+  'auth/getUserDetails',
+  async (_, {getState, rejectWithValue}) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.token;
+      
+      if (!token) {
+        return rejectWithValue('No token available');
+      }
+
+      console.log('Using token for auth:', token);
+
+      const response = await fetch('https://dummyjson.com/auth/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log('Error response:', errorData);
+        return rejectWithValue(errorData.message || 'Failed to fetch user details');
+      }
+
+      const data = await response.json();
+      console.log('User details response:', data);
+      await storage.setItem(StorageKeys.USER_DATA, data);
+      return data;
+    } catch (error) {
+      console.error('getUserDetails error:', error);
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to fetch user details');
     }
   },
 );
@@ -124,6 +168,7 @@ const authSlice = createSlice({
         state.user = userData;
         state.token = accessToken;
         state.error = null;
+        console.log('State after login:', { user: state.user, token: state.token });
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -140,6 +185,19 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isInitialized = true;
         state.error = action.error.message || 'Failed to load token';
+      })
+      .addCase(getUserDetails.pending, state => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getUserDetails.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+        state.error = null;
+      })
+      .addCase(getUserDetails.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
       });
   },
 });

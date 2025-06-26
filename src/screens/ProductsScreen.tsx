@@ -12,7 +12,7 @@ import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 type RootStackParamList = {
   Products: undefined;
-  ProductDetails: {productId: string};
+  ProductDetails: {productId: number};
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Products'>;
@@ -20,7 +20,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Products'>;
 export const ProductsScreen: React.FC<Props> = ({navigation}) => {
   const {products, isLoading, error} = useProducts();
 
-  if (isLoading) {
+  if (isLoading.products) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#007AFF" />
@@ -28,10 +28,10 @@ export const ProductsScreen: React.FC<Props> = ({navigation}) => {
     );
   }
 
-  if (error) {
+  if (error.products) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorText}>hello {error}</Text>
+        <Text style={styles.errorText}>{error.products}</Text>
       </View>
     );
   }
@@ -48,7 +48,7 @@ export const ProductsScreen: React.FC<Props> = ({navigation}) => {
             }
           />
         )}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.centered}>

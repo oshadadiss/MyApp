@@ -1,26 +1,41 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   TextInput,
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  Text,
 } from 'react-native';
-import {useAppSelector, useAppDispatch} from '../store/hooks';
+import {useProducts} from '../hooks/useProducts';
 import {ProductCard} from '../components/ProductCard';
+import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
 
-export const SearchScreen = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const dispatch = useAppDispatch();
-  const {items: products, isLoading} = useAppSelector(state => state.products);
+type RootStackParamList = {
+  Search: undefined;
+  ProductDetails: {productId: number};
+};
 
-  const filteredProducts = products.filter(
-    product =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+type Props = NativeStackScreenProps<RootStackParamList, 'Search'>;
+
+export const SearchScreen: React.FC<Props> = ({navigation}) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [previousQuery, setPreviousQuery] = useState('');
+  const {searchResults, searchForProducts, isLoading, error} = useProducts();
+
+  useEffect(() => {
+    if (searchQuery.length >= 2 && searchQuery !== previousQuery) {
+      searchForProducts(searchQuery);
+      setPreviousQuery(searchQuery);
+    }
+  }, [searchQuery, previousQuery, searchForProducts]);
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setPreviousQuery('');
+  };
 
   return (
     <View style={styles.container}>
@@ -45,20 +60,38 @@ export const SearchScreen = () => {
             size={20}
             color="#666"
             style={styles.clearIcon}
-            onPress={() => setSearchQuery('')}
+            onPress={handleClearSearch}
           />
         )}
       </View>
 
-      {isLoading ? (
+      {isLoading.search ? (
         <ActivityIndicator size="large" color="#007AFF" style={styles.loader} />
+      ) : error.search ? (
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>{error.search}</Text>
+        </View>
       ) : (
         <FlatList
-          data={filteredProducts}
-          renderItem={({item}) => <ProductCard product={item} />}
-          keyExtractor={item => item.id}
+          data={searchResults}
+          renderItem={({item}) => (
+            <ProductCard
+              product={item}
+              onPress={() =>
+                navigation.navigate('ProductDetails', {productId: item.id})
+              }
+            />
+          )}
+          keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.productList}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            searchQuery.length >= 2 ? (
+              <View style={styles.centered}>
+                <Text style={styles.emptyText}>No products found</Text>
+              </View>
+            ) : null
+          }
         />
       )}
     </View>
@@ -93,10 +126,24 @@ const styles = StyleSheet.create({
   },
   loader: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   productList: {
     padding: 16,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  errorText: {
+    color: '#FF3B30',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  emptyText: {
+    color: '#8E8E93',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
