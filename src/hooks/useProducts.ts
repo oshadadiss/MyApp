@@ -1,45 +1,60 @@
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { setLoading, setProducts, setError } from '../store/slices/productSlice';
-import { productsService } from '../services/productsService';
+import {
+  fetchAllProducts,
+  fetchProductById,
+  searchProducts,
+  selectAllProducts,
+  selectSelectedProduct,
+  selectSearchResults,
+  selectProductsLoading,
+  selectProductsError,
+} from '../store/slices/productSlice';
 
 export const useProducts = () => {
   const dispatch = useAppDispatch();
-  const { items, isLoading, error } = useAppSelector((state) => state.products);
+  const products = useAppSelector(selectAllProducts);
+  const selectedProduct = useAppSelector(selectSelectedProduct);
+  const searchResults = useAppSelector(selectSearchResults);
+  const loading = useAppSelector(selectProductsLoading);
+  const error = useAppSelector(selectProductsError);
 
-  const fetchProducts = async () => {
-    try {
-      dispatch(setLoading(true));
-      const products = await productsService.getProducts();
-      dispatch(setProducts(products));
-    } catch (err) {
-      dispatch(setError(err instanceof Error ? err.message : 'Failed to fetch products'));
-    } finally {
-      dispatch(setLoading(false));
-    }
+  const loadProducts = () => {
+    dispatch(fetchAllProducts());
   };
 
-  const fetchProductsByCategory = async (category: string) => {
-    try {
-      dispatch(setLoading(true));
-      const products = await productsService.getProductsByCategory(category);
-      dispatch(setProducts(products));
-    } catch (err) {
-      dispatch(setError(err instanceof Error ? err.message : 'Failed to fetch products'));
-    } finally {
-      dispatch(setLoading(false));
-    }
+  const loadProductById = (id: number) => {
+    dispatch(fetchProductById(id));
+  };
+
+  const searchForProducts = (query: string) => {
+    dispatch(searchProducts(query));
   };
 
   useEffect(() => {
-    fetchProducts();
+    loadProducts();
   }, []);
 
   return {
-    products: items,
-    isLoading,
-    error,
-    fetchProducts,
-    fetchProductsByCategory,
+    // Data
+    products,
+    selectedProduct,
+    searchResults,
+    // Loading states
+    isLoading: {
+      products: loading.items,
+      selectedProduct: loading.selectedProduct,
+      search: loading.search,
+    },
+    // Error states
+    error: {
+      products: error.items,
+      selectedProduct: error.selectedProduct,
+      search: error.search,
+    },
+    // Actions
+    loadProducts,
+    loadProductById,
+    searchForProducts,
   };
 };

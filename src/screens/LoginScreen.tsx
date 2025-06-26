@@ -139,13 +139,12 @@ const styles = StyleSheet.create({
   },
   input: {
     color: '#333',
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-    fontSize: 16,
+    height: 40,
+    borderColor: '#ddd',
     borderWidth: 1,
-    borderColor: '#DDD',
+    marginBottom: 15,
+    padding: 10,
+    borderRadius: 5,
   },
   button: {
     marginTop: 10,

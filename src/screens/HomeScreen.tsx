@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
+import {View, Text, StyleSheet} from 'react-native';
+import {useSelector} from 'react-redux';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
-import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import type { RootState } from '../store/store';
+import type {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
+import type {RootState} from '../store/store';
 
 type RootTabParamList = {
   Home: undefined;
@@ -14,14 +14,14 @@ type RootTabParamList = {
 type Props = BottomTabScreenProps<RootTabParamList, 'Home'>;
 
 const HomeScreen: React.FC<Props> = () => {
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   return (
     <View style={styles.container}>
       <Feather name="home" size={50} color="#007AFF" />
       <Text style={styles.title}>Welcome to MyApp</Text>
       <Text style={styles.subtitle}>
-        {user ? `Hello, ${user.name}!` : 'Please sign in'}
+        {user ? `Hello, ${user.firstName}!` : 'Please sign in'}
       </Text>
     </View>
   );
