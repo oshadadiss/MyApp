@@ -1,13 +1,13 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Switch, Alert} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Switch, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // @ts-ignore
 import Feather from 'react-native-vector-icons/Feather';
-import type {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
 type RootTabParamList = {
-  Home: undefined,
-  Settings: undefined,
+  Home: undefined;
+  Settings: undefined;
 };
 
 type Props = BottomTabScreenProps<RootTabParamList, 'Settings'>;
@@ -24,7 +24,7 @@ const SettingsScreen: React.FC<Props> = () => {
     try {
       const darkModeSetting = await AsyncStorage.getItem('darkMode');
       const notificationsSetting = await AsyncStorage.getItem('notifications');
-
+      
       if (darkModeSetting !== null) {
         setDarkMode(JSON.parse(darkModeSetting));
       }
@@ -53,7 +53,7 @@ const SettingsScreen: React.FC<Props> = () => {
         <Text style={styles.settingText}>Dark Mode</Text>
         <Switch
           value={darkMode}
-          onValueChange={value => {
+          onValueChange={(value) => {
             setDarkMode(value);
             saveSetting('darkMode', value);
           }}
@@ -67,7 +67,7 @@ const SettingsScreen: React.FC<Props> = () => {
         <Text style={styles.settingText}>Notifications</Text>
         <Switch
           value={notifications}
-          onValueChange={value => {
+          onValueChange={(value) => {
             setNotifications(value);
             saveSetting('notifications', value);
           }}
