@@ -110,8 +110,3 @@ GitHub: @oshadadiss
 MIT – free to use and modify.
 
 ---
-
-Let me know if you'd like to:
-- Add dynamic screenshots
-- Customize this for deployment (e.g. Fastlane, APK)
-- Update after you upload more screens like Home or Search
